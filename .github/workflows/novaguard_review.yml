@@ -1,0 +1,72 @@
+name: NovaGuard AI Code Review (Self-Hosted Test)
+
+on:
+  pull_request:
+    branches: [ main ] # Trigger khi có PR vào nhánh main
+
+permissions:
+  contents: read         # Cần để checkout code
+  pull-requests: write # Cần để đăng comment lên PR (nếu thêm tính năng này)
+  security-events: write # Cần để upload SARIF report
+
+jobs:
+  novaguard_review:
+    name: Run NovaGuard AI Review
+    # >>> Quan trọng: Chạy trên self-hosted runner <<<
+    runs-on: self-hosted
+
+    steps:
+      # 1. Checkout code của project sample (novaguard-test-project)
+      - name: Checkout Sample Project Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Lấy toàn bộ history để git diff hoạt động đúng
+
+      # 2. Checkout code của NovaGuard AI Action vào một thư mục con
+      #    Thay 'YOUR_GITHUB_USERNAME/novaguard-ai' bằng đường dẫn repo của bạn
+      #    Giả sử repo NovaGuard AI của bạn tên là 'novaguard-ai'
+      - name: Checkout NovaGuard AI Action Code
+        uses: actions/checkout@v4
+        with:
+          repository: dino-nlp/NovaGuard-AI # <<< THAY THẾ CHO ĐÚNG
+          path: ./.novaguard-ai-action # Checkout vào thư mục ẩn trong workspace
+          # token: ${{ secrets.YOUR_PAT_IF_PRIVATE }} # Thêm nếu repo NovaGuard AI là private
+
+      # 3. Chạy NovaGuard AI Action từ code local đã checkout
+      - name: Run NovaGuard AI
+        # >>> Quan trọng: Sử dụng đường dẫn tương đối đến action.yml đã checkout <<<
+        uses: ./.novaguard-ai-action # Trỏ đến thư mục chứa action.yml của NovaGuard AI
+        id: novaguard
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # >>> Quan trọng: Đặt URL Ollama server của self-hosted runner <<<
+          ollama_base_url: 'http://localhost:11434' # Hoặc IP/hostname đúng của Ollama server
+          # project_config_path: '.github/novaguard_config' # Bỏ comment nếu project sample có config riêng
+          sarif_output_file: 'results/novaguard.sarif'
+          # fail_on_severity: 'warning' # Ví dụ: làm action fail nếu có warning
+
+      # 4. Upload SARIF Report lên GitHub Code Scanning
+      - name: Upload SARIF to GitHub Code Scanning
+        # Chạy ngay cả khi bước novaguard fail (để vẫn thấy report)
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          # Lấy đường dẫn file SARIF từ output của bước 'novaguard'
+          sarif_file: ${{ steps.novaguard.outputs.sarif_file_path }}
+          # Đặt category để phân biệt nguồn gốc của cảnh báo trong UI
+          category: 'NovaGuardAI-${{ github.head_ref }}'
+
+      # --- Bước 5: Thêm Comment vào PR (TÙY CHỌN - Nâng cao) ---
+      # Bước này hiện tại chưa được hỗ trợ sẵn bởi Action của bạn.
+      # Bạn cần thêm logic vào action_entrypoint.py để tạo và post comment.
+      # Hoặc dùng action bên ngoài như peter-evans/create-or-update-comment:
+      # - name: Post Summary Comment to PR
+      #   if: success() || failure() # Hoặc chỉ chạy khi success()
+      #   uses: peter-evans/create-or-update-comment@v4
+      #   with:
+      #     issue-number: ${{ github.event.pull_request.number }}
+      #     body: |
+      #       **NovaGuard AI Review Summary:**
+      #       ${{ steps.novaguard.outputs.report_summary_text }}
+      #
+      #       [View full SARIF results in Code Scanning](${{ github.server_url }}/${{ github.repository }}/security/code-scanning?query=pr%3A${{ github.event.pull_request.number }})
