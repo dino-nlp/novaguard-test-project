@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Lấy toàn bộ history để git diff hoạt động đúng
+          clean: false 
 
       # 2. Checkout code của NovaGuard AI Action vào một thư mục con
       #    Thay 'YOUR_GITHUB_USERNAME/novaguard-ai' bằng đường dẫn repo của bạn
@@ -40,7 +41,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # >>> Quan trọng: Đặt URL Ollama server của self-hosted runner <<<
-          ollama_base_url: 'http://localhost:11434' # Hoặc IP/hostname đúng của Ollama server
+          ollama_base_url: 'http://172.17.0.1:11434' # Hoặc IP/hostname đúng của Ollama server
           # project_config_path: '.github/novaguard_config' # Bỏ comment nếu project sample có config riêng
           sarif_output_file: 'results/novaguard.sarif'
           # fail_on_severity: 'warning' # Ví dụ: làm action fail nếu có warning
