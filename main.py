@@ -5,7 +5,7 @@ import sys # Lỗi: Unused import (StyleGuardian / Pylint)
 # Lỗi: Thiếu docstring cho function (StyleGuardian / Pylint)
 def process_data(data, factor ): # Lỗi: Khoảng trắng thừa trước dấu hai chấm, thừa sau factor (StyleGuardian / Pylint)
     # Lỗi: Biến không được sử dụng (StyleGuardian / Pylint)
-    unused_var = 123
+    unused_var = 1234
 
     # Lỗi tiềm ẩn: Nếu data là None thì sao? (BugHunter)
     if data is not None:
@@ -20,7 +20,7 @@ def process_data(data, factor ): # Lỗi: Khoảng trắng thừa trước dấu
          # Lỗi tiềm ẩn: Có thể không hiệu quả nếu data rất lớn (OptiTune)
          result_list = []
          for item in data:
-             result_list.append(str(item) * factor) # Có thể tối ưu?
+             result_list.append(str(item) * factor * 10) # Có thể tối ưu?
 
          return processed_value, result_list
     return 0, [] # Trả về giá trị mặc định nếu data là None
@@ -74,4 +74,3 @@ if __name__ == "__main__":
 
 # Thêm một comment không cần thiết vào cuối file
 # Unnecessary comment
-# Yet another comment to trigger the action
