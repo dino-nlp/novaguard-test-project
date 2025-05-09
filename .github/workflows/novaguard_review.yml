@@ -1,4 +1,4 @@
-name: NovaGuard AI Code Review (Self-Hosted Test)
+name: NovaGuard AI Code Review (Self-Hosted)
 
 on:
   pull_request:

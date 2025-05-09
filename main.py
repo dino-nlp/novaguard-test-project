@@ -2,7 +2,7 @@ import os
 import sys
 
 def process_data(data, factor ):
-    unused_var = 1234
+    unused_var = 12345
 
     if data is not None:
         try:
@@ -10,7 +10,6 @@ def process_data(data, factor ):
         except ZeroDivisionError:
             print("Cannot divide by zero!") 
             processed_value = float('inf')
-
         result_list = []
         for item in data:
              result_list.append(str(item) * factor) 
@@ -25,9 +24,8 @@ def insecure_function(user_input):
     except FileNotFoundError:
         return "File not found."
     except Exception as e:
-        print(f"Error reading file: {e}") # Log lỗi có thể lộ thông tin (SecuriSense?)
+        print(f"Error reading file: {e}")
         return "Error reading file."
-
 
 def main():
     my_data = ["apple", "banana", "cherry"]
