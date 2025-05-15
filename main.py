@@ -7,7 +7,7 @@ import datetime # Unused import
 import collections # Unused import
 
 # Global variable that might be flagged as unused or for naming convention
-GLOBAL_API_ENDPOINT = "https://api.example.com/data"
+GLOBAL_API_ENDPOINT = "https://api.example.com/data/hihi"
 
 class OldStyleClass: # No explicit inheritance from object (for Python 2 style, Pylint might flag in Py3)
     pass
@@ -34,7 +34,7 @@ def processUserData(user_id, data_payload, transaction_id): # Naming convention 
         else:
             # This handling might be okay, but the division by zero is a risk.
             processed_value = -1 
-            print("Transaction ID is zero, cannot process value normally.")
+            print("Transaction ID is zero, cannot process value normally.!!")
         
         # Inefficient string building in a loop
         log_message = ""
@@ -60,7 +60,7 @@ def fetch_resource(resource_name, user_role="guest"):
     Intended to have security vulnerabilities.
     """
     # Hardcoded secret/token
-    SECRET_TOKEN = "super_secret_demo_token_123!@#"
+    SECRET_TOKEN = "super_secret_demo_token_123!@#zzz"
     
     # Path Traversal: resource_name is directly used.
     # The application should validate resource_name and ensure it's within an allowed directory.
